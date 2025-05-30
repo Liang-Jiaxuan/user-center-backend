@@ -58,8 +58,6 @@ public class User implements Serializable {
      * 标签列表 json
      */
     private String tags;
-
-
     /**
      * 状态 0-正常
      */
@@ -204,5 +202,13 @@ public class User implements Serializable {
 
     public void setUserRole(Integer userRole) {
         this.userRole = userRole;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
     }
 }

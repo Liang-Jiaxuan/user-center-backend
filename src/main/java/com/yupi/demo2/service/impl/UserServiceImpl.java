@@ -2,6 +2,9 @@ package com.yupi.demo2.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
+import com.google.gson.reflect.TypeToken;
 import com.yupi.demo2.common.ErrorCode;
 import com.yupi.demo2.exception.BusinessException;
 import com.yupi.demo2.model.User;
@@ -17,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -184,13 +188,33 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (CollectionUtils.isEmpty(tagNameList)){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
+//        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+//        // 拼接 and 查询
+//        for (String tagName : tagNameList) {
+//            queryWrapper.like("tags",tagName);
+//        }
+//        List<User> userList = userMapper.selectList(queryWrapper);
+//return userList.stream().map(this::getSafeUser).collect(Collectors.toList());
+
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        // 拼接 and 查询
-        for (String tagName : tagNameList) {
-            queryWrapper.like("tags",tagName);
-        }
+        // 先查询所有用户
         List<User> userList = userMapper.selectList(queryWrapper);
-        return userList.stream().map(this::getSafeUser).collect(Collectors.toList());
+        Gson gson = new Gson();
+        // 在内存中判断是否包含要求的标签
+
+        return userList.stream().filter(user -> {
+                String tagsStr = user.getTags();
+                if (StringUtils.isBlank(tagsStr)){
+                    return false;
+                }
+                Set<String> tempTagNameSet = gson.fromJson(tagsStr, new TypeToken<Set<String>>(){}.getType());
+                for (String tagName : tagNameList) {
+                    if(!tempTagNameSet.contains(tagName)){
+                        return false;
+                    }
+                }
+                return true;
+        }).map(this::getSafeUser).collect(Collectors.toList());
     }
 }
 
