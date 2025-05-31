@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: dev
   application:
     name: user-center
   datasource:
@@ -6,9 +8,19 @@ spring:
     url: jdbc:mysql://localhost:3306/yupi
     username: root
     password: 1617929300
-    #session失效时间
+  #session失效时间
   session:
     timeout: 86400
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  data:
+    redis:
+      port: 6379
+      host: 192.168.18.129
+      database: 0
+      password: 1617929300
+
 
 server:
   port: 8080

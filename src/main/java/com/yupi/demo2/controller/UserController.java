@@ -12,9 +12,11 @@ import com.yupi.demo2.service.UserService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +25,7 @@ import static com.yupi.demo2.constant.UserConstant.USER_LOGIN_STATE;
 
 @RestController
 @RequestMapping("/user")
+@CrossOrigin(origins = { "http://localhost:3000" })
 public class UserController {
 
     @Resource
@@ -97,6 +100,16 @@ public class UserController {
         List<User> list = userList.stream().map(user -> userService.getSafeUser(user)).collect(Collectors.toList());
         return ResultUtils.success(list);
     }
+
+    @GetMapping("/search/tags")
+    public BaseResponse<List<User>> searchUsersByTags(@RequestParam(required = false) List<String> tagNameList){
+        if (CollectionUtils.isEmpty(tagNameList)){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        List<User> userList = userService.searchUsersByTags(tagNameList);
+        return ResultUtils.success(userList);
+    }
+
 
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteUser(@RequestBody long id,HttpServletRequest request){
