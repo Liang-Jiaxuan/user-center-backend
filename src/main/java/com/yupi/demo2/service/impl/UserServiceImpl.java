@@ -19,7 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -178,7 +180,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     /**
-     * 根据标签搜索用户
+     * 根据标签搜索用户(内存过滤)
      *
      * @param tagNameList 用户要拥有的标签
      * @return
@@ -188,13 +190,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (CollectionUtils.isEmpty(tagNameList)){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-//        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-//        // 拼接 and 查询
-//        for (String tagName : tagNameList) {
-//            queryWrapper.like("tags",tagName);
-//        }
-//        List<User> userList = userMapper.selectList(queryWrapper);
-//return userList.stream().map(this::getSafeUser).collect(Collectors.toList());
 
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         // 先查询所有用户
@@ -208,6 +203,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
                     return false;
                 }
                 Set<String> tempTagNameSet = gson.fromJson(tagsStr, new TypeToken<Set<String>>(){}.getType());
+                tempTagNameSet = Optional.ofNullable(tempTagNameSet).orElse(new HashSet<>());
                 for (String tagName : tagNameList) {
                     if(!tempTagNameSet.contains(tagName)){
                         return false;
@@ -215,6 +211,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
                 }
                 return true;
         }).map(this::getSafeUser).collect(Collectors.toList());
+    }
+
+    /**
+     * 根据标签搜索用户(SQL查询版)
+     *
+     * @param tagNameList 用户要拥有的标签
+     * @return
+     */
+    @Deprecated
+    private List<User> searchUsersByTagsBySQL(List<String> tagNameList){
+        if (CollectionUtils.isEmpty(tagNameList)){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        // 拼接 and 查询
+        for (String tagName : tagNameList) {
+            queryWrapper.like("tags",tagName);
+        }
+        List<User> userList = userMapper.selectList(queryWrapper);
+        return userList.stream().map(this::getSafeUser).collect(Collectors.toList());
     }
 }
 
