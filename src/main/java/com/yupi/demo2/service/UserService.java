@@ -6,6 +6,9 @@ import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
+import static com.yupi.demo2.constant.UserConstant.ADMIN_ROLE;
+import static com.yupi.demo2.constant.UserConstant.USER_LOGIN_STATE;
+
 /**
 * @author 16179
 * @description 针对表【user(用户)】的数据库操作Service
@@ -59,4 +62,31 @@ public interface UserService extends IService<User> {
      * @return
      */
     List<User> searchUsersByTags(List<String> tagNameList);
+
+    /**
+     * 更新用户信息
+     * @param user
+     * @return
+     */
+    int updateUser(User user,User loginUser);
+
+    /**
+     * 获取当前用户登录信息
+     * @return
+     */
+    User getLoginUser(HttpServletRequest request);
+
+    /**
+     * 是否为管理员
+     * @param request
+     * @return
+     */
+    boolean isAdmin(HttpServletRequest request);
+
+    /**
+     * 是否为管理员
+     * @param loginUser
+     * @return
+     */
+    boolean isAdmin(User loginUser);
 }

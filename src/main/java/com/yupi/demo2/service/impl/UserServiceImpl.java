@@ -3,7 +3,6 @@ package com.yupi.demo2.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.gson.Gson;
-import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.yupi.demo2.common.ErrorCode;
 import com.yupi.demo2.exception.BusinessException;
@@ -27,6 +26,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.yupi.demo2.constant.UserConstant.ADMIN_ROLE;
 import static com.yupi.demo2.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
@@ -211,6 +211,51 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
                 }
                 return true;
         }).map(this::getSafeUser).collect(Collectors.toList());
+    }
+
+    @Override
+    public int updateUser(User user, User loginUser) {
+        long userId = user.getId();
+        if (userId <= 0){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        //如果是管理员,允许更新任意用户
+        //如果不是管理员, 只允许更新当前(自己的)信息
+        if (!isAdmin(loginUser) && userId != loginUser.getId()){
+            throw new BusinessException(ErrorCode.NO_AUTH);
+        }
+        User oldUser = userMapper.selectById(userId);
+        if (oldUser == null){
+            throw new BusinessException(ErrorCode.NULL_ERROR);
+        }
+        return userMapper.updateById(user);
+    }
+
+    @Override
+    public User getLoginUser(HttpServletRequest request) {
+        if (request == null){
+            return null;
+        }
+
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        if (userObj == null){
+            throw new BusinessException(ErrorCode.NO_AUTH);
+        }
+        return (User)userObj;
+    }
+
+    @Override
+    public boolean isAdmin(HttpServletRequest request) {
+        //仅管理员可查询
+        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
+        User user = (User)userObj;
+        return user != null && user.getUserRole() == ADMIN_ROLE;
+    }
+
+    @Override
+    public boolean isAdmin(User loginUser) {
+
+        return loginUser != null && loginUser.getUserRole() == ADMIN_ROLE;
     }
 
     /**

@@ -88,7 +88,7 @@ public class UserController {
     public BaseResponse<List<User>> searchUsers(String username,HttpServletRequest request){
 
         //仅管理员可查询
-        if (!isAdmin(request)){
+        if (!userService.isAdmin(request)){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
 
@@ -111,10 +111,22 @@ public class UserController {
     }
 
 
+    @PostMapping("/update")
+    public BaseResponse<Integer> updateUser(@RequestBody User user, HttpServletRequest request){
+        // 1 校验参数是否为空
+        if (user == null){
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User loginUser = userService.getLoginUser(request);
+
+        int result = userService.updateUser(user, loginUser);
+        return ResultUtils.success(result);
+    }
+
     @PostMapping("/delete")
     public BaseResponse<Boolean> deleteUser(@RequestBody long id,HttpServletRequest request){
         //仅管理员可查询
-        if (!isAdmin(request)){
+        if (!userService.isAdmin(request)){
             return null;
         }
         if (id <= 0) {
@@ -124,18 +136,7 @@ public class UserController {
         return ResultUtils.success(b);
     }
 
-    /**
-     * 是否为管理员
-     * @param request
-     * @return
-     */
-    private boolean isAdmin(HttpServletRequest request){
-        //仅管理员可查询
-        Object userObj = request.getSession().getAttribute(USER_LOGIN_STATE);
-        User user = (User)userObj;
-        if (user == null || user.getUserRole() != ADMIN_ROLE){
-            return false;
-        }
-        return true;
-    }
+
+
+
 }
