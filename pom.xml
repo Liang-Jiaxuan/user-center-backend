@@ -51,6 +51,11 @@
 			<artifactId>spring-session-data-redis</artifactId>
 			<version>3.4.3</version>
 		</dependency>
+		<dependency>
+			<groupId>org.redisson</groupId>
+			<artifactId>redisson</artifactId>
+			<version>3.17.5</version>
+		</dependency>
 
 
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->

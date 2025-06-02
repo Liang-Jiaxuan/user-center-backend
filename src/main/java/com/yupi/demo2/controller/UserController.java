@@ -137,7 +137,7 @@ public class UserController {
         try {
             valueOperations.set(redisKey, userPage, 10000, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
-            log.error("redis set key error ", e);
+            System.out.println("redis set key error " + e);
         }
         return ResultUtils.success(userPage);
     }
