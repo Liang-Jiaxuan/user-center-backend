@@ -1,10 +1,12 @@
 package com.yupi.demo2.service.impl;
 
+
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import generator.domain.Team;
-import generator.mapper.TeamMapper;
-import generator.service.TeamService;
+import com.yupi.demo2.mapper.TeamMapper;
+import com.yupi.demo2.model.Team;
+import com.yupi.demo2.service.TeamService;
 import org.springframework.stereotype.Service;
+
 
 /**
 * @author 16179
@@ -13,7 +15,7 @@ import org.springframework.stereotype.Service;
 */
 @Service
 public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team>
-    implements TeamService{
+    implements TeamService {
 
 }
 

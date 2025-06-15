@@ -1,7 +1,8 @@
 package com.yupi.demo2.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import generator.domain.Team;
+import com.yupi.demo2.model.Team;
+
 
 /**
 * @author 16179

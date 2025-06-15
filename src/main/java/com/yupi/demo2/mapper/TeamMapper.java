@@ -1,7 +1,8 @@
 package com.yupi.demo2.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import generator.domain.Team;
+import com.yupi.demo2.model.Team;
+
 
 /**
 * @author 16179
